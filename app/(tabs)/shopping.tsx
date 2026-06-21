@@ -3,16 +3,17 @@ import { useState } from 'react';
 import {
   View,
   Text,
+  Image,
   ScrollView,
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
-  Modal,
   TextInput,
 } from 'react-native';
+import { AppModal } from '@/src/components/AppModal';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import AddButtonSvg from '@/assets/images/Add-Button.svg';
+import AddButtonImg from '@/assets/images/Add-Button.png';
 import { useRouter } from 'expo-router';
 import { useShoppingList } from '@/src/hooks/useShoppingList';
 import { useHouseStore } from '@/src/store/houseStore';
@@ -419,11 +420,14 @@ export default function ShoppingScreen() {
         onPress={() => setFabMenuOpen((v) => !v)}
         activeOpacity={0.85}
       >
-        <AddButtonSvg width={64} height={64} />
+        <View style={{ width: 64, height: 64, borderRadius: 32, overflow: 'hidden', alignItems: 'center', justifyContent: 'center' }}>
+          <Image source={AddButtonImg} style={[StyleSheet.absoluteFillObject, { opacity: 0.53 }]} resizeMode="cover" />
+          <Ionicons name="add" size={20} color="#2E0800" />
+        </View>
       </TouchableOpacity>
 
       {/* ── Add new item modal ───────────────────────────────────────────── */}
-      <Modal
+      <AppModal
         visible={newItemModalOpen}
         transparent
         animationType="fade"
@@ -667,10 +671,10 @@ export default function ShoppingScreen() {
             )}
           </View>
         </View>
-      </Modal>
+      </AppModal>
 
       {/* ── Recurring step 2: deadline & assignment ─────────────────────── */}
-      <Modal
+      <AppModal
         visible={recurringStep2Open}
         transparent
         animationType="fade"
@@ -911,10 +915,10 @@ export default function ShoppingScreen() {
             })()}
           </View>
         </View>
-      </Modal>
+      </AppModal>
 
       {/* ── Bought modal ────────────────────────────────────────────────── */}
-      <Modal
+      <AppModal
         visible={!!boughtItem}
         transparent
         animationType="fade"
@@ -1028,10 +1032,10 @@ export default function ShoppingScreen() {
             </View>
           </View>
         </View>
-      </Modal>
+      </AppModal>
 
       {/* ── Edit item modal ─────────────────────────────────────────────── */}
-      <Modal
+      <AppModal
         visible={!!editingItem}
         transparent
         animationType="fade"
@@ -1161,10 +1165,10 @@ export default function ShoppingScreen() {
             </View>
           </View>
         </View>
-      </Modal>
+      </AppModal>
 
       {/* ── Recurring items modal ────────────────────────────────────────── */}
-      <Modal
+      <AppModal
         visible={recurringModalOpen}
         transparent
         animationType="fade"
@@ -1234,7 +1238,7 @@ export default function ShoppingScreen() {
             </View>
           </View>
         </View>
-      </Modal>
+      </AppModal>
     </SafeAreaView>
   );
 }

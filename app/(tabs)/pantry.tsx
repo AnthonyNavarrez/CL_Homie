@@ -3,6 +3,7 @@ import { useRef, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
+  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -18,8 +19,8 @@ import { BarcodeScannerModal } from '@/src/components/pantry/BarcodeScannerModal
 import type { PantryItem } from '@/src/types';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import PantryBg from '@/assets/images/Pantry-bg.svg';
-import AddButtonSvg from '@/assets/images/Add-Button.svg';
+import PantryBgImg from '@/assets/images/Pantry-bg.jpg';
+import AddButtonImg from '@/assets/images/Add-Button.png';
 
 const P = {
   alertBg: '#FFF1D5',
@@ -94,7 +95,8 @@ function PantryContent() {
 
       {/* Content */}
       <View style={styles.contentArea}>
-        <PantryBg width="100%" height="100%" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }} preserveAspectRatio="xMidYMid slice" />
+        <Image source={PantryBgImg} style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, width: '100%', height: '100%' }} resizeMode="cover" />
+        <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: '#FFFFFF', opacity: 0.2 }} />
         {isLoading ? (
           <View style={styles.centered}>
             <ActivityIndicator size="large" color="#2D3436" />
@@ -131,7 +133,10 @@ function PantryContent() {
 
       {/* FAB */}
       <TouchableOpacity style={styles.fab} onPress={() => setFabMenuOpen((v) => !v)} activeOpacity={0.8}>
-        <AddButtonSvg width={64} height={64} />
+        <View style={{ width: 64, height: 64, borderRadius: 32, overflow: 'hidden', alignItems: 'center', justifyContent: 'center' }}>
+          <Image source={AddButtonImg} style={[StyleSheet.absoluteFillObject, { opacity: 0.53 }]} resizeMode="cover" />
+          <Ionicons name="add" size={20} color="#2E0800" />
+        </View>
       </TouchableOpacity>
 
       {/* Barcode scanner */}

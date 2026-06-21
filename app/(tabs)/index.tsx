@@ -6,11 +6,11 @@ import { isChoreDueOn } from '@/src/utils/choreSchedule';
 import { getWeekKey } from '@/src/utils/weekKey';
 import { differenceInCalendarDays, format, isPast, isToday, isTomorrow } from 'date-fns';
 import { useRouter } from 'expo-router';
-import { Timestamp, doc, serverTimestamp, updateDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { useState } from 'react';
+import { Timestamp } from 'firebase/firestore';
+import { useEffect, useState } from 'react';
 import { Alert, Platform } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GridBackground } from '@/src/components/GridBackground';
 import { useAuthStore } from '@/src/store/authStore';
 import { useHouseStore } from '@/src/store/houseStore';
@@ -18,12 +18,11 @@ import RecentActivitySvg from '@/assets/images/recent activity.svg';
 import RecentActivityIcon from '@/assets/images/Recent Activity icon.svg';
 import { Ionicons } from '@expo/vector-icons';
 import CalendarIcon from '@/assets/images/CalendarIcon.svg';
-import HeaderSvg from '@/assets/images/header.svg';
+import HeaderImg from '@/assets/images/header.png';
 import NoticeBoardIcon from '@/assets/images/Notice-board-icon.svg';
 import HomeSettingIcon from '@/assets/images/home-setting-icon.svg';
 import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { db, storage } from '@/src/firebase/config';
 
 // ─── tokens ──────────────────────────────────────────────────────────────────
 const C = {
@@ -276,10 +275,18 @@ export default function HomeScreen() {
   const recentActivities = rawActivities.sort((a, b) => b.ts - a.ts).slice(0, 3);
 
   const houseId = house?.id;
-  const [uploading, setUploading] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [pictureLabel, setPictureLabel] = useState('');
+  const [localPicture, setLocalPicture] = useState<{ uri: string; updatedAt: number } | null>(null);
 
-  const pickAndUploadImage = async () => {
+  useEffect(() => {
+    if (!houseId) return;
+    AsyncStorage.getItem(`pictureCard:${houseId}`).then((raw) => {
+      if (raw) setLocalPicture(JSON.parse(raw));
+    });
+  }, [houseId]);
+
+  const pickAndSaveImage = async () => {
     if (!houseId) return;
     if (Platform.OS !== 'web') {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -293,21 +300,20 @@ export default function HomeScreen() {
       quality: 0.7,
       allowsEditing: true,
       aspect: [4, 3],
+      base64: true,
     });
     if (result.canceled) return;
-    setUploading(true);
+    setSaving(true);
     try {
-      const uri = result.assets[0].uri;
-      const response = await fetch(uri);
-      const blob = await response.blob();
-      const storageRef = ref(storage, `houses/${houseId}/pictureCard`);
-      await uploadBytes(storageRef, blob);
-      const url = await getDownloadURL(storageRef);
-      await updateDoc(doc(db, 'houses', houseId), { pictureCardUrl: url, pictureCardUpdatedAt: serverTimestamp() });
+      const asset = result.assets[0];
+      const uri = `data:${asset.mimeType ?? 'image/jpeg'};base64,${asset.base64}`;
+      const picture = { uri, updatedAt: Date.now() };
+      await AsyncStorage.setItem(`pictureCard:${houseId}`, JSON.stringify(picture));
+      setLocalPicture(picture);
     } catch (e) {
-      console.error('[pictureCard] upload failed:', e);
+      console.error('[pictureCard] save failed:', e);
     } finally {
-      setUploading(false);
+      setSaving(false);
     }
   };
 
@@ -315,7 +321,7 @@ export default function HomeScreen() {
     <View style={styles.safe}>
       <GridBackground />
       <View style={{ width: '100%', overflow: 'hidden' }}>
-        <HeaderSvg width="100%" height={117} preserveAspectRatio="xMidYMid slice" />
+        <Image source={HeaderImg} style={{ width: '100%', height: 117 }} resizeMode="cover" />
         <View style={styles.headerTextBlock}>
           <Text style={styles.headerHouseName}>{house?.name ?? ''}</Text>
           <Text style={styles.headerUserName}>{userProfile?.displayName ?? ''}</Text>
@@ -460,18 +466,18 @@ export default function HomeScreen() {
           <View style={styles.column}>
             <Note color={C.magnetYellow} hideStrip hideLines style={{ minHeight: 260 }}>
               <Pressable
-                onPress={pickAndUploadImage}
+                onPress={pickAndSaveImage}
                 style={{ alignSelf: 'stretch', height: 200, backgroundColor: '#2E0800', borderRadius: 0, marginTop: 0, overflow: 'hidden', alignItems: 'center', justifyContent: 'center' }}
               >
-                {house?.pictureCardUrl ? (
-                  <Image source={{ uri: house.pictureCardUrl }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
+                {localPicture?.uri ? (
+                  <Image source={{ uri: localPicture.uri }} style={{ width: '100%', height: '100%' }} resizeMode="cover" />
                 ) : (
-                  <Ionicons name={uploading ? 'hourglass-outline' : 'image-outline'} size={32} color="#ffffff44" />
+                  <Ionicons name={saving ? 'hourglass-outline' : 'image-outline'} size={32} color="#ffffff44" />
                 )}
               </Pressable>
-              {house?.pictureCardUpdatedAt && (
+              {localPicture?.updatedAt && (
                 <Text style={styles.pictureDateText}>
-                  {format(house.pictureCardUpdatedAt.toDate(), 'dd,MM,yy')}
+                  {format(new Date(localPicture.updatedAt), 'dd,MM,yy')}
                 </Text>
               )}
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingRight: 4 }}>

@@ -1,13 +1,13 @@
 import { useRef, useState } from 'react';
 import { useRouter } from 'expo-router';
-import { Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { BottomSheetModal, BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { GridBackground } from '@/src/components/GridBackground';
-import HeaderSvg from '@/assets/images/header.svg';
-import AddButtonSvg from '@/assets/images/Add-Button.svg';
+import HeaderImg from '@/assets/images/header.png';
+import AddButtonImg from '@/assets/images/Add-Button.png';
 import { NoticeForm, type NewNoticeInput } from '@/src/components/noticeboard/NoticeForm';
 import { NoticeCard } from '@/src/components/noticeboard/NoticeCard';
 
@@ -42,7 +42,9 @@ export default function NoticeBoardScreen() {
         <View style={styles.safe}>
           <GridBackground />
           <View style={{ width: '100%', overflow: 'hidden' }}>
-            <HeaderSvg width="100%" height={117} preserveAspectRatio="xMidYMid slice" pointerEvents="none" />
+            <View style={{ pointerEvents: 'none' }}>
+              <Image source={HeaderImg} style={{ width: '100%', height: 117 }} resizeMode="cover" />
+            </View>
             <Pressable style={styles.backButton} onPress={() => router.push('/(tabs)')} hitSlop={10}>
               <Ionicons name="chevron-back" size={22} color="#2E0800" />
             </Pressable>
@@ -100,7 +102,10 @@ export default function NoticeBoardScreen() {
               accessibilityRole="button"
               onPress={() => formRef.current?.present()}
             >
-              <AddButtonSvg width={64} height={64} />
+              <View style={{ width: 64, height: 64, borderRadius: 32, overflow: 'hidden', alignItems: 'center', justifyContent: 'center' }}>
+                <Image source={AddButtonImg} style={[StyleSheet.absoluteFillObject, { opacity: 0.53 }]} resizeMode="cover" />
+                <Ionicons name="add" size={20} color="#2E0800" />
+              </View>
             </TouchableOpacity>
           </SafeAreaView>
         </View>

@@ -6,7 +6,7 @@ import { useChores } from "@/src/hooks/useChores";
 import { useHouseStore } from "@/src/store/houseStore";
 import type { CalendarEvent, Chore } from "@/src/types";
 import { Ionicons } from "@expo/vector-icons";
-import AddButtonSvg from '@/assets/images/Add-Button.svg';
+import AddButtonImg from '@/assets/images/Add-Button.png';
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import {
   addDays,
@@ -23,7 +23,7 @@ import { useRef, useState } from "react";
 import {
   ActivityIndicator,
   Dimensions,
-  Modal,
+  Image,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -31,6 +31,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { AppModal } from '@/src/components/AppModal';
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const C = {
@@ -345,14 +346,17 @@ export default function CalendarScreen() {
           accessibilityLabel="Add event"
           accessibilityRole="button"
         >
-          <AddButtonSvg width={64} height={64} />
+          <View style={{ width: 64, height: 64, borderRadius: 32, overflow: 'hidden', alignItems: 'center', justifyContent: 'center' }}>
+            <Image source={AddButtonImg} style={[StyleSheet.absoluteFillObject, { opacity: 0.53 }]} resizeMode="cover" />
+            <Ionicons name="add" size={20} color="#2E0800" />
+          </View>
         </TouchableOpacity>
 
         <EventForm ref={formRef} onSubmit={addEvent} onUpdate={updateEvent} event={selectedEvent} />
       </View>
 
       {/* ── Filter popup ─────────────────────────────────────────────── */}
-      <Modal visible={showFilter} transparent animationType="fade" onRequestClose={() => setShowFilter(false)}>
+      <AppModal visible={showFilter} transparent animationType="fade" onRequestClose={() => setShowFilter(false)}>
         <Pressable style={StyleSheet.absoluteFillObject} onPress={() => setShowFilter(false)} />
         <View style={[styles.filterPopup, { top: filterPos.top, right: filterPos.right }]}>
           {(['All', 'Chores', 'Events', 'Others'] as const).map((opt) => {
@@ -370,7 +374,7 @@ export default function CalendarScreen() {
             );
           })}
         </View>
-      </Modal>
+      </AppModal>
     </SafeAreaView>
   );
 }

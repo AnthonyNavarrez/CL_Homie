@@ -1,26 +1,32 @@
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, Image, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { doc, updateDoc } from 'firebase/firestore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GridBackground } from '@/src/components/GridBackground';
 import { ImageCropModal } from '@/src/components/ImageCropModal';
 import { useAuthStore } from '@/src/store/authStore';
 import { signOut } from '@/src/firebase/auth';
-import { db, storage } from '@/src/firebase/config';
-import HeaderSvg from '@/assets/images/header.svg';
+import HeaderImg from '@/assets/images/header.png';
 
 export default function MyAccountScreen() {
   const router = useRouter();
   const userProfile = useAuthStore((s) => s.userProfile);
   const firebaseUser = useAuthStore((s) => s.firebaseUser);
-  const setUserProfile = useAuthStore((s) => s.setUserProfile);
   const [uploading, setUploading] = useState(false);
   const [cropUri, setCropUri] = useState<string | null>(null);
   const [signingOut, setSigningOut] = useState(false);
+  const [localAvatarUri, setLocalAvatarUri] = useState<string | null>(null);
+  const avatarUri = localAvatarUri ?? userProfile?.avatarUrl ?? undefined;
+
+  useEffect(() => {
+    if (!firebaseUser?.uid) return;
+    AsyncStorage.getItem(`avatar:${firebaseUser.uid}`).then((uri) => {
+      if (uri) setLocalAvatarUri(uri);
+    });
+  }, [firebaseUser?.uid]);
 
   async function handleSignOut() {
     setSigningOut(true);
@@ -46,27 +52,24 @@ export default function MyAccountScreen() {
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: false,
       quality: 1,
+      base64: true,
     });
 
     if (result.canceled) return;
-    setCropUri(result.assets[0].uri);
+    const asset = result.assets[0];
+    setCropUri(`data:${asset.mimeType ?? 'image/jpeg'};base64,${asset.base64}`);
   }
 
-  async function uploadAvatar(uri: string) {
+  async function saveAvatar(uri: string) {
     if (!firebaseUser?.uid) return;
     setCropUri(null);
     setUploading(true);
     try {
-      const response = await fetch(uri);
-      const blob = await response.blob();
-      const storageRef = ref(storage, `users/${firebaseUser.uid}/avatar`);
-      await uploadBytes(storageRef, blob);
-      const url = await getDownloadURL(storageRef);
-      await updateDoc(doc(db, 'users', firebaseUser.uid), { avatarUrl: url });
-      if (userProfile) setUserProfile({ ...userProfile, avatarUrl: url });
+      await AsyncStorage.setItem(`avatar:${firebaseUser.uid}`, uri);
+      setLocalAvatarUri(uri);
     } catch (e: any) {
-      console.error('[MyAccount] avatar upload failed', e);
-      Alert.alert('Upload failed', e?.message ?? 'Could not upload image. Please try again.');
+      console.error('[MyAccount] avatar save failed', e);
+      Alert.alert('Save failed', e?.message ?? 'Could not save image. Please try again.');
     } finally {
       setUploading(false);
     }
@@ -78,7 +81,9 @@ export default function MyAccountScreen() {
 
       {/* Header */}
       <View style={{ width: '100%', overflow: 'hidden' }}>
-        <HeaderSvg width="100%" height={117} preserveAspectRatio="xMidYMid slice" pointerEvents="none" />
+        <View style={{ pointerEvents: 'none' }}>
+          <Image source={HeaderImg} style={{ width: '100%', height: 117 }} resizeMode="cover" />
+        </View>
         <Pressable style={styles.backBtn} onPress={() => router.push('/(tabs)/settings')} hitSlop={12}>
           <Ionicons name="chevron-back" size={22} color="#2E0800" />
         </Pressable>
@@ -88,7 +93,7 @@ export default function MyAccountScreen() {
       <ImageCropModal
         visible={!!cropUri}
         imageUri={cropUri ?? ''}
-        onConfirm={uploadAvatar}
+        onConfirm={saveAvatar}
         onCancel={() => setCropUri(null)}
       />
 
@@ -98,8 +103,8 @@ export default function MyAccountScreen() {
           {/* Avatar */}
           <View style={styles.avatarWrap}>
             <Pressable onPress={pickAvatar} disabled={uploading} style={styles.avatarPressable}>
-              {userProfile?.avatarUrl ? (
-                <Image source={{ uri: userProfile.avatarUrl }} style={styles.avatar} />
+              {avatarUri ? (
+                <Image source={{ uri: avatarUri }} style={styles.avatar} />
               ) : (
                 <View style={[styles.avatar, styles.avatarFallback]}>
                   <Text style={styles.avatarInitial}>

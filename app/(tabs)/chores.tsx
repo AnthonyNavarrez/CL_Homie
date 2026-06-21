@@ -3,8 +3,8 @@ import { ChoreDetailSheet } from '@/src/components/chores/ChoreDetailSheet';
 import { ChoreForm } from '@/src/components/chores/ChoreForm';
 import { ProgressRing } from '@/src/components/chores/ProgressRing';
 import { GridBackground } from '@/src/components/GridBackground';
-import HeaderSvg from '@/assets/images/header.svg';
-import AddButtonSvg from '@/assets/images/Add-Button.svg';
+import HeaderImg from '@/assets/images/header.png';
+import AddButtonImg from '@/assets/images/Add-Button.png';
 import { useChores } from '@/src/hooks/useChores';
 import { CHORE_THEME } from '@/src/theme/chores';
 import type { Chore } from '@/src/types';
@@ -17,6 +17,7 @@ import { useRouter } from 'expo-router';
 import { useRef, useState } from 'react';
 import {
     ActivityIndicator,
+    Image,
     ScrollView,
     StyleSheet,
     Text,
@@ -120,7 +121,9 @@ export default function ChoresScreen() {
     <View style={styles.container}>
       <GridBackground />
       <View style={{ width: '100%', overflow: 'hidden' }}>
-        <HeaderSvg width="100%" height={117} preserveAspectRatio="xMidYMid slice" pointerEvents="none" />
+        <View style={{ pointerEvents: 'none' }}>
+          <Image source={HeaderImg} style={{ width: '100%', height: 117 }} resizeMode="cover" />
+        </View>
         <Text style={styles.headerTitle}>Chores</Text>
       </View>
       <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
@@ -236,7 +239,10 @@ export default function ChoresScreen() {
         accessibilityRole="button"
         accessibilityLabel="Add chore"
       >
-        <AddButtonSvg width={64} height={64} />
+        <View style={{ width: 64, height: 64, borderRadius: 32, overflow: 'hidden', alignItems: 'center', justifyContent: 'center' }}>
+          <Image source={AddButtonImg} style={[StyleSheet.absoluteFillObject, { opacity: 0.53 }]} resizeMode="cover" />
+          <Ionicons name="add" size={20} color="#2E0800" />
+        </View>
       </TouchableOpacity>
 
       <ChoreForm ref={sheetRef} onSubmit={addChore} />

@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   Alert,
+  Image,
   Keyboard,
-  Modal,
   ScrollView,
   StyleSheet,
   Text,
@@ -10,12 +10,13 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { AppModal } from '@/src/components/AppModal';
 import { Ionicons } from '@expo/vector-icons';
 import { addDays, format } from 'date-fns';
 import { Calendar } from 'react-native-calendars';
 import type { AddPantryItemInput } from '@/src/hooks/usePantry';
 import type { PantryItem } from '@/src/types';
-import BgTexture from '@/assets/images/Bg-texture.svg';
+import BgTextureImg from '@/assets/images/Bg-texture.jpg';
 
 interface Props {
   visible: boolean;
@@ -132,7 +133,7 @@ export function ManualAddModal({ visible, onClose, onAdd, onUpdate, editItem }: 
   const customLabel = customDate ? format(customDate, 'MMM d') + ' (custom)' : 'custom';
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+    <AppModal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <TouchableOpacity
         style={styles.backdrop}
         activeOpacity={1}
@@ -140,7 +141,8 @@ export function ManualAddModal({ visible, onClose, onAdd, onUpdate, editItem }: 
       >
         <TouchableOpacity style={styles.card} activeOpacity={1}>
           <View style={[StyleSheet.absoluteFillObject, { backgroundColor: '#F5EDE3', borderRadius: 24 }]} />
-          <BgTexture width="100%" height="100%" style={[StyleSheet.absoluteFillObject, { borderRadius: 24 }]} preserveAspectRatio="xMidYMid slice" />
+          <Image source={BgTextureImg} style={[StyleSheet.absoluteFillObject, { borderRadius: 24 }]} resizeMode="cover" />
+          <View style={[StyleSheet.absoluteFillObject, { borderRadius: 24, backgroundColor: '#FFFFFF', opacity: 0.2 }]} />
 
           {successInfo ? (
             /* ── Success screen ── */
@@ -278,7 +280,7 @@ export function ManualAddModal({ visible, onClose, onAdd, onUpdate, editItem }: 
           )}
         </TouchableOpacity>
       </TouchableOpacity>
-    </Modal>
+    </AppModal>
   );
 }
 

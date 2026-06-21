@@ -19,8 +19,6 @@ export interface House {
   memberNames?: Record<string, string>; // denormalized userId -> displayName for quick reads
   createdBy: string; // userId
   createdAt: Timestamp;
-  pictureCardUrl?: string;
-  pictureCardUpdatedAt?: Timestamp | null;
   // Weekly chore rollover (client-driven; see src/firebase/choreRollover.ts).
   // Acts as a master switch: when false, no chore auto-rotates regardless of
   // its per-chore `autoRotate` flag.

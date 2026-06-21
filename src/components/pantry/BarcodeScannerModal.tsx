@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
   Dimensions,
-  Modal,
   Platform,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
+import { AppModal } from '@/src/components/AppModal';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 
 const { width: SCREEN_W } = Dimensions.get('window');
@@ -39,7 +39,7 @@ export function BarcodeScannerModal({ visible, onScan, onClose }: Props) {
 
   if (Platform.OS === 'web') {
     return (
-      <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+      <AppModal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
         <View style={styles.webOverlay}>
           <View style={styles.webCard}>
             <Text style={styles.webTitle}>Not Available</Text>
@@ -51,13 +51,13 @@ export function BarcodeScannerModal({ visible, onScan, onClose }: Props) {
             </TouchableOpacity>
           </View>
         </View>
-      </Modal>
+      </AppModal>
     );
   }
 
   if (!permission?.granted) {
     return (
-      <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
+      <AppModal visible={visible} animationType="slide" onRequestClose={onClose}>
         <View style={styles.permScreen}>
           <Text style={styles.permTitle}>Camera Access Needed</Text>
           <Text style={styles.permBody}>
@@ -76,12 +76,12 @@ export function BarcodeScannerModal({ visible, onScan, onClose }: Props) {
             <Text style={styles.cancelLinkText}>Cancel</Text>
           </TouchableOpacity>
         </View>
-      </Modal>
+      </AppModal>
     );
   }
 
   return (
-    <Modal visible={visible} animationType="slide" statusBarTranslucent onRequestClose={onClose}>
+    <AppModal visible={visible} animationType="slide" statusBarTranslucent onRequestClose={onClose}>
       <View style={styles.scanner}>
         <CameraView
           style={StyleSheet.absoluteFillObject}
@@ -112,7 +112,7 @@ export function BarcodeScannerModal({ visible, onScan, onClose }: Props) {
           </TouchableOpacity>
         </View>
       </View>
-    </Modal>
+    </AppModal>
   );
 }
 

@@ -11,7 +11,8 @@ import {
 import { format } from 'date-fns';
 import { Timestamp } from 'firebase/firestore';
 import React, { forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert, Modal, Platform, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Alert, Platform, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { AppModal } from '@/src/components/AppModal';
 import { Calendar } from 'react-native-calendars';
 import { AssignmentTile } from './AssignmentTile';
 import { MonthDayPicker } from './MonthDayPicker';
@@ -343,7 +344,7 @@ export const ChoreForm = forwardRef<BottomSheetModal, ChoreFormProps>(
                 )}
               </TouchableOpacity>
 
-              <Modal visible={showDatePicker} transparent animationType="fade">
+              <AppModal visible={showDatePicker} transparent animationType="fade">
                 <Pressable style={styles.calOverlay} onPress={() => setShowDatePicker(false)}>
                   <Pressable style={styles.calCard} onPress={(e) => e.stopPropagation()}>
                     <Calendar
@@ -371,7 +372,7 @@ export const ChoreForm = forwardRef<BottomSheetModal, ChoreFormProps>(
                     />
                   </Pressable>
                 </Pressable>
-              </Modal>
+              </AppModal>
             </>
           )}
 

@@ -17,9 +17,7 @@ import { Platform, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
 
-const PHONE_W = 412;
-const PHONE_H = 915;
-
+import { PHONE_W, PHONE_H } from '@/constants/layout';
 import { migrateChoreSchema } from '@/src/firebase/choreMigrations';
 import { useAuthListener } from '@/src/hooks/useAuth';
 import { useNotificationsRegistration } from '@/src/hooks/useNotifications';

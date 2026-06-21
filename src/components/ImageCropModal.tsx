@@ -1,5 +1,7 @@
 import { useEffect } from 'react';
-import { Dimensions, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { AppModal } from '@/src/components/AppModal';
+import { PHONE_W, PHONE_H } from '@/constants/layout';
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated, {
   runOnJS,
@@ -8,7 +10,11 @@ import Animated, {
   withSpring,
 } from 'react-native-reanimated';
 
-const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
+// On web everything renders inside app/_layout.tsx's simulated phone canvas
+// (PHONE_W x PHONE_H), which is then scaled to fit the browser window — so
+// size against that canvas, not the real (much larger) browser window.
+const { width: SCREEN_W, height: SCREEN_H } =
+  Platform.OS === 'web' ? { width: PHONE_W, height: PHONE_H } : Dimensions.get('window');
 const CROP_SIZE = Math.min(SCREEN_W, SCREEN_H) * 0.78;
 const MIN_SCALE = 1;
 const MAX_SCALE = 5;
@@ -74,7 +80,7 @@ export function ImageCropModal({ visible, imageUri, onConfirm, onCancel }: Props
   }
 
   return (
-    <Modal visible={visible} animationType="fade" transparent statusBarTranslucent>
+    <AppModal visible={visible} animationType="fade" transparent statusBarTranslucent>
       <GestureHandlerRootView style={styles.overlay}>
         {/* Dim backdrop */}
         <View style={StyleSheet.absoluteFill} pointerEvents="none">
@@ -107,7 +113,7 @@ export function ImageCropModal({ visible, imageUri, onConfirm, onCancel }: Props
           </Pressable>
         </View>
       </GestureHandlerRootView>
-    </Modal>
+    </AppModal>
   );
 }
 

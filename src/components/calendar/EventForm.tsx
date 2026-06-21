@@ -7,9 +7,9 @@ import {
   StyleSheet,
   Alert,
   ScrollView,
-  Modal,
   Pressable,
 } from 'react-native';
+import { AppModal } from '@/src/components/AppModal';
 import {
   BottomSheetModal,
   BottomSheetScrollView,
@@ -249,7 +249,7 @@ export const EventForm = forwardRef<BottomSheetModal, Props>(
           <TimePickerRow value={startDate} onChange={setStartDate} />
 
           {/* Calendar modal */}
-          <Modal visible={showDatePicker} transparent animationType="fade">
+          <AppModal visible={showDatePicker} transparent animationType="fade">
             <Pressable style={styles.calOverlay} onPress={() => setShowDatePicker(false)}>
               <Pressable style={styles.calCard} onPress={(e) => e.stopPropagation()}>
                 <Calendar
@@ -279,7 +279,7 @@ export const EventForm = forwardRef<BottomSheetModal, Props>(
                 />
               </Pressable>
             </Pressable>
-          </Modal>
+          </AppModal>
 
           {/* Recurrence */}
           <Text style={[styles.label, { marginTop: 8 }]}>Recurrence</Text>

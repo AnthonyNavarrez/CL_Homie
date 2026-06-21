@@ -22,7 +22,7 @@ import { houseDoc } from '@/src/firebase/firestore';
 import { leaveHouse } from '@/src/firebase/house';
 import { useAuthStore } from '@/src/store/authStore';
 import { useHouseStore } from '@/src/store/houseStore';
-import HeaderSvg from '@/assets/images/header.svg';
+import HeaderImg from '@/assets/images/header.png';
 import { updateDoc } from 'firebase/firestore';
 
 const S = {
@@ -137,7 +137,7 @@ export default function SettingsScreen() {
     <View style={styles.safe}>
       <GridBackground />
       <View style={{ width: '100%', overflow: 'hidden' }}>
-        <HeaderSvg width="100%" height={117} preserveAspectRatio="xMidYMid slice" />
+        <Image source={HeaderImg} style={{ width: '100%', height: 117 }} resizeMode="cover" />
         <Text style={styles.headerTitle}>Settings</Text>
       </View>
       <SafeAreaView style={{ flex: 1 }} edges={['bottom']}>
