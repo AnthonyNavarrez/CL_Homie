@@ -52,7 +52,12 @@ export default function RootLayout() {
   }, [loaded]);
 
   const { height: windowHeight } = useWindowDimensions();
-  const scale = Platform.OS === 'web' ? Math.min(1, (windowHeight - 32) / PHONE_H) : 1;
+  // useWindowDimensions falls back to { height: 0 } during server-side
+  // static export (no real window yet) and briefly on initial hydration.
+  // Without this guard that collapses the scale to ~0, hiding everything
+  // behind the dark backdrop until the real height is measured.
+  const scale =
+    Platform.OS === 'web' && windowHeight > 32 ? Math.min(1, (windowHeight - 32) / PHONE_H) : 1;
   const frameWidth = Math.round(PHONE_W * scale);
   const frameHeight = Math.round(PHONE_H * scale);
 
